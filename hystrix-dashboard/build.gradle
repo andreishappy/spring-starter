@@ -1,0 +1,20 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    hystrixDashboard
+}
+
+dependencies {
+    hystrixDashboard "com.github.kennedyoliveira:standalone-hystrix-dashboard:1.5.3"
+}
+
+task runHystrixDashboard(type: JavaExec) {
+    main = "com.github.kennedyoliveira.hystrix.contrib.standalone.dashboard.HystrixDashboardLauncher"
+    classpath = configurations.hystrixDashboard
+}

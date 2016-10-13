@@ -1,0 +1,175 @@
+/*
+ * Declare build plugins
+ */
+
+// Old way of using Gradle plugins
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    ext {
+        SPRING_BOOT_VERSION = '1.4.0.RELEASE'
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${project.properties.SPRING_BOOT_VERSION}")
+    }
+}
+
+// New way of using Gradle plugins
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'idea'
+    id 'findbugs'
+}
+
+apply plugin: 'spring-boot'
+
+/*
+ * Repositories
+ */
+repositories {
+    mavenCentral()
+}
+
+/*
+ * Declare global build properties
+ */
+ext {
+    GRADLE_VERSION = '2.14'
+    CUCUMBER_VERSION = '1.2.4'
+}
+
+/*
+ * Source code, Compilation and Dependencies
+ */
+
+sourceSets {
+    // end2end resources and classpaths
+    end2endTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+
+        groovy {
+            srcDir file('src/test-end-to-end/groovy')
+        }
+
+        resources.srcDir file('src/test-end-to-end/resources')
+    }
+}
+
+// dependencies for compilation and testing
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    compile 'org.springframework.boot:spring-boot-starter-jetty',
+            'org.springframework.boot:spring-boot-starter-actuator',
+            'org.springframework.data:spring-data-redis',
+            'org.projectlombok:lombok:1.16.8',
+            'org.codehaus.janino:janino:2.7.8',
+            'com.google.code.findbugs:annotations:3.0.0',
+            'org.apache.httpcomponents:httpclient:4.5.2',
+            'com.netflix.hystrix:hystrix-core:1.5.5',
+            'com.netflix.hystrix:hystrix-metrics-event-stream:1.4.10',
+            'io.reactivex:rxjava:1.1.9',
+            'io.jmnarloch:rxjava-spring-boot-starter:1.0.0',
+            'org.apache.commons:commons-pool2:2.4.2',
+            'net.logstash.logback:logstash-logback-encoder:4.7',
+            'io.dropwizard.metrics:metrics-core:3.1.0',
+            'com.google.code.findbugs:annotations:3.0.0',
+            'org.glassfish.jersey.ext.rx:jersey-rx-client-rxjava:2.23.2'
+
+    testCompile "junit:junit",
+            "org.springframework.boot:spring-boot-starter-test",
+            'com.google.guava:guava-testlib:19.0',
+            //cucumber dependencies
+            "info.cukes:cucumber-junit:${CUCUMBER_VERSION}",
+            "info.cukes:cucumber-groovy:${CUCUMBER_VERSION}",
+            //spock dependencies
+            "org.codehaus.groovy:groovy-all:2.4.1",
+            "org.spockframework:spock-core:1.0-groovy-2.4",
+            'cglib:cglib-nodep:3.2.3'
+}
+
+// end2end dependencies extends test. Probably could exclude cucumber from test in future.
+configurations {
+    end2endTestCompile.extendsFrom testCompile
+    end2endTestRuntime.extendsFrom testRuntime
+}
+
+/*
+ * Configure tasks
+ */
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = sourceCompatibility
+}
+
+// Output of this build
+jar {
+    baseName = 'spring-starter'
+    version = '0.1.0'
+}
+
+// Log unit tests and integration tests in different places
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+
+// Disable FindBugs XML
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+// Convenience for SpringBoot jvmArgs
+bootRun {
+    systemProperties = System.properties
+}
+
+/*
+ * New Tasks that can be executed in the build
+ */
+
+// Pull in tasks from mock-servers sub-project
+evaluationDependsOn ":mock-servers"
+
+// Task to install or update the Gradle wrapper of the Project
+task wrapper(type: Wrapper) {
+    gradleVersion = "${GRADLE_VERSION}"
+}
+
+// Task to execute Cucumber integration tests against a mock-server
+task end2endTest(type: Test) {
+
+    dependsOn assemble, ":mock-servers:startMockServers"
+
+    outputs.upToDateWhen { false }
+
+    testClassesDir = sourceSets.end2endTest.output.classesDir
+    classpath = sourceSets.end2endTest.runtimeClasspath
+
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.end2endTestRuntime + sourceSets.main.output + sourceSets.end2endTest.output
+            args = ['--plugin', 'pretty', '--tags', '~@wip', '--glue', 'src/test-end-to-end/groovy/steps', 'src/test-end-to-end/resources/features']
+            systemProperties = System.properties
+        }
+    }
+
+    finalizedBy ":mock-servers:stopMockServers"
+}
+
+check.dependsOn end2endTest
+end2endTest.mustRunAfter test

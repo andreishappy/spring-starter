@@ -1,0 +1,24 @@
+{
+  "name": "feature",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "body-parser": "^1.15.1",
+    "colors": "^1.1.2",
+    "cucumber": "^0.10.2",
+    "express": "^4.13.4",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "yargs": "^4.7.0"
+  },
+  "dependencies": {
+    "sleep": "^3.0.1"
+  }
+}

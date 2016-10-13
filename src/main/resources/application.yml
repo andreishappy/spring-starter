@@ -1,0 +1,8 @@
+spring.jackson.default-property-inclusion: non_null
+
+# See: https://wiki.eclipse.org/Jetty/Howto/High_Load
+server:
+  minThreads: 50
+  maxThreads: 50
+  threadIdleTimeoutMillis: 60000
+  queueCapacity: 6000 # 1 min to recover at 100 req/s 60*100=6000
