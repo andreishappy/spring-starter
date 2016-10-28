@@ -35,14 +35,14 @@ class ExecWait extends DefaultTask {
     }
 }
 
-task installContentApiMockServerLibs(type: Exec) {
+task installApiMockServerLibs(type: Exec) {
     workingDir "${API_MOCK_SERVER_RELATIVE_PATH}"
     executable 'npm'
     args 'install'
 }
 
-task startContentApiMockServer(type: ExecWait) {
-    dependsOn installContentApiMockServerLibs
+task startApiMockServer(type: ExecWait) {
+    dependsOn installApiMockServerLibs
 
     directory file("${API_MOCK_SERVER_RELATIVE_PATH}").absolutePath
     command 'npm start'
@@ -50,7 +50,7 @@ task startContentApiMockServer(type: ExecWait) {
 }
 
 task startMockServers {
-    dependsOn startContentApiMockServer
+    dependsOn startApiMockServer
 }
 
 task stopMockServers {

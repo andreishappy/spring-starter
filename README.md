@@ -72,7 +72,7 @@ To run the unit tests only:
 
 Project lombok is included in this project so if you want to use an IDE we recommend intelliJ. You will have to do 2 things:
 
-1. Enable annotation processing for the project after you import it 
+1. Enable annotation processing for the project after you import it [instructions here](https://www.jetbrains.com/help/idea/2016.2/configuring-annotation-processing.html)
 2. Install the lombok plugin
 
 ### Running Hystrix Dashboard ###
@@ -82,4 +82,4 @@ To run it:
 
 `./gradlew runHystrixDashboard`
 
-This will startup a local Hystrix Dashboard on http://localhost:7979/hystrix-dashboard/
+This will startup a local Hystrix Dashboard at http://localhost:7979/hystrix-dashboard/

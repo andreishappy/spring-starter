@@ -1,4 +1,4 @@
-package app.Application;
+package app.application;
 
 import com.netflix.hystrix.strategy.HystrixPlugins;
 import org.springframework.boot.SpringApplication;

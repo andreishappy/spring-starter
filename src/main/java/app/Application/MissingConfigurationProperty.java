@@ -1,4 +1,4 @@
-package app.Application;
+package app.application;
 
 public class MissingConfigurationProperty extends RuntimeException {
     public MissingConfigurationProperty(String s) {

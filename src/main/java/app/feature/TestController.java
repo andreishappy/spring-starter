@@ -1,6 +1,6 @@
-package app.TestFeature;
+package app.feature;
 
-import app.UpstreamErrors.ApiErrorHandler;
+import app.upstream.errors.ApiErrorHandler;
 import org.glassfish.jersey.client.rx.rxjava.RxObservable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

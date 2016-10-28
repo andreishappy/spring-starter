@@ -1,7 +1,7 @@
 package helpers
 
 import com.netflix.hystrix.Hystrix
-import app.Application.Application
+import app.application.Application
 import org.springframework.context.ApplicationContext
 import org.springframework.core.env.AbstractEnvironment
 
